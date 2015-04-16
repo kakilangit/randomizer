@@ -22,12 +22,19 @@
         panic(e)
     }
     fmt.Print(i)
+    //min, max
+    m, e := randomizer.RandomMinMax(-10, 10)
+    if e != nil {
+        panic(e)
+    }
+    log.Println(m)
+
     
 
 
 The MIT License (MIT)
 
-Copyright (c) 2015 kakilangit@gmail.com
+Copyright (c) 2015 theguywhodrinkscoffeeandcodes@gmail.com
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

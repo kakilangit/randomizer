@@ -37,16 +37,30 @@ func Random(length int, mask uint64) (string, error) {
 //RandomInt output is int64
 //Parameters desired length, max length = 19, max random = (10 pow 20) - 1
 func RandomInt(length int) (int64, error) {
-	if length < 1 || length > 19 {
+	if length < 1 || length > 18 {
 		return 0, errors.New("Invalid length")
 	}
 
 	rand.Seed(time.Now().Unix())
 
-	min := math.Pow10(length - 1)
-	max := math.Pow10(length) - 1
+	min := int64(math.Pow10(length - 1))
+	max := int64(math.Pow10(length) - 1)
 
-	return int64(min) + rand.Int63n(int64(max-min)), nil
+	return RandomMinMax(min, max)
+}
+
+//RandomMinMax output is int64
+//Parameters min, max
+func RandomMinMax(min, max int64) (int64, error) {
+	if min < math.MinInt64 || max > math.MaxInt64 {
+		return 0, errors.New("Invalid parameter(s)")
+	}
+
+	if min > max {
+		min, max = max, min
+	}
+
+	return min + rand.Int63n(max-min), nil
 }
 
 func _populate(length int, mask uint64) string {
@@ -72,5 +86,10 @@ func _randomize(seedbox string) string {
 		return ""
 	}
 
-	return string([]byte(seedbox)[rand.Intn(len(seedbox)-1)])
+	r, e := RandomMinMax(0, int64(len(seedbox)-1))
+	if e != nil {
+		return ""
+	}
+
+	return string([]byte(seedbox)[r])
 }

@@ -4,6 +4,8 @@
 
     go get github.com/kakilangit/randomizer
 
+[![Build Status](https://travis-ci.org/kakilangit/randomizer.svg?branch=master)](https://travis-ci.org/kakilangit/randomizer)
+
 ##Usage
 
     import (

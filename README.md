@@ -1,30 +1,33 @@
 #Randomizer
 
+[![Build Status](https://travis-ci.org/kakilangit/randomizer.svg?branch=master)](https://travis-ci.org/kakilangit/randomizer)
+
 ##Installation
 
     go get github.com/kakilangit/randomizer
 
-[![Build Status](https://travis-ci.org/kakilangit/randomizer.svg?branch=master)](https://travis-ci.org/kakilangit/randomizer)
-
 ##Usage
 
-    import (
-        "fmt"
-        "github.com/kakilangit/randomizer"
-    )
-    //string
+    import "github.com/kakilangit/randomizer"
+
+###Random String
+
     s, e := randomizer.Random(10, randomizer.NUMERIC|randomizer.SMALL)
     if e != nil {
         panic(e)
     }
     fmt.Print(s)
-    //int64
+
+###Random Integer
+
     i, e := randomizer.RandomInt(15)
     if e != nil {
         panic(e)
     }
     fmt.Print(i)
-    //min, max
+
+###Random Integer with Boundary
+
     m, e := randomizer.RandomMinMax(-10, 10)
     if e != nil {
         panic(e)
@@ -36,7 +39,7 @@
 
 The MIT License (MIT)
 
-Copyright (c) 2015 theguywhodrinkscoffeeandcodes@gmail.com
+Copyright (c) 2015 kakilangit<theguywhodrinkscoffeeandcodes@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -7,7 +7,7 @@ import (
 
 func TestRandom(t *testing.T) {
 	length, _ := RandomMinMax(0, 18)
-	v, err := Random(int(length), NUMERIC|SMALL|CAPITAL)
+	v, err := Random(int(length), NUMERIC|SMALL|CAPITAL|SYMBOL, false)
 	if err != nil {
 		t.Error(err.Error())
 	}

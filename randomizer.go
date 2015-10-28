@@ -35,8 +35,6 @@ func Random(length int, mask uint64, args ...interface{}) (string, error) {
 		switch v := arg.(type) {
 		case bool:
 			pronounce = v
-		default:
-
 		}
 	}
 
@@ -106,12 +104,12 @@ func RandomInt(length int) (int64, error) {
 //RandomMinMax output is int64
 //Parameters min, max
 func RandomMinMax(min, max int64) (int64, error) {
-	if min < math.MinInt64 || max > math.MaxInt64 {
-		return 0, errors.New("Invalid parameter(s)")
-	}
-
 	if min > max {
 		min, max = max, min
+	}
+
+	if min <= math.MinInt64 || max >= math.MaxInt64 {
+		return 0, errors.New("Invalid parameter(s)")
 	}
 
 	return min + rand.Int63n(max-min), nil

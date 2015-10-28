@@ -6,8 +6,24 @@ import (
 )
 
 func TestRandom(t *testing.T) {
-	length, _ := RandomMinMax(0, 18)
-	v, err := Random(int(length), NUMERIC|SMALL|CAPITAL|SYMBOL, false)
+	pronounce := false
+
+	//Length 0
+	v, err := Random(0, NUMERIC|SMALL|CAPITAL|SYMBOL, pronounce)
+	if err == nil {
+		t.Error("Length cannot be zero")
+	}
+
+	length, _ := RandomMinMax(1, 18)
+	//Pronounce false
+	v, err = Random(int(length), NUMERIC|SMALL|CAPITAL|SYMBOL, pronounce)
+	if err != nil {
+		t.Error(err.Error())
+	}
+
+	//Pronounce true
+	pronounce = true
+	v, err = Random(int(length), NUMERIC|SMALL|CAPITAL|SYMBOL, pronounce)
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -20,8 +36,14 @@ func TestRandom(t *testing.T) {
 }
 
 func TestRandomInt(t *testing.T) {
-	length, _ := RandomMinMax(0, 18)
-	v, err := RandomInt(int(length))
+	//Length 0
+	v, err := RandomInt(0)
+	if err == nil {
+		t.Error("Length cannot be zero")
+	}
+
+	length, _ := RandomMinMax(1, 18)
+	v, err = RandomInt(int(length))
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -36,10 +58,17 @@ func TestRandomInt(t *testing.T) {
 }
 
 func TestRandomMinMax(t *testing.T) {
-	min, _ := RandomMinMax(-20, 0)
-	max, _ := RandomMinMax(0, 20)
+	//Min > Max
+	//Boundary overflow
+	v, err := RandomMinMax(math.MaxInt64, math.MinInt64)
+	if err == nil {
+		t.Error("Boundary is Integer 64")
+	}
 
-	v, err := RandomMinMax(min, max)
+	min, _ := RandomMinMax(-20, 0)
+	max, _ := RandomMinMax(1, 20)
+
+	v, err = RandomMinMax(min, max)
 	if err != nil {
 		t.Error(err.Error())
 	}

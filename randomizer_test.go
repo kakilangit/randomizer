@@ -79,3 +79,93 @@ func TestRandomMinMax(t *testing.T) {
 
 	t.Log(v)
 }
+
+func BenchmarkRandomNumeric10(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		Random(10, NUMERIC)
+	}
+}
+
+func BenchmarkRandomSmall10(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		Random(10, SMALL)
+	}
+}
+
+func BenchmarkRandomCapital10(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		Random(10, CAPITAL)
+	}
+}
+
+func BenchmarkRandomSymbol10(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		Random(10, SYMBOL)
+	}
+}
+
+func BenchmarkRandomNumericSmall10(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		Random(10, NUMERIC|SMALL)
+	}
+}
+
+func BenchmarkRandomNumericCapital10(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		Random(10, NUMERIC|CAPITAL)
+	}
+}
+
+func BenchmarkRandomNumericSymbol10(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		Random(10, NUMERIC|SYMBOL)
+	}
+}
+
+func BenchmarkRandomSmallCapital10(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		Random(10, SMALL|CAPITAL)
+	}
+}
+
+func BenchmarkRandomSmallSymbol10(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		Random(10, SMALL|SYMBOL)
+	}
+}
+
+func BenchmarkRandomCapitalSymbol10(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		Random(10, CAPITAL|SYMBOL)
+	}
+}
+
+func BenchmarkRandomNumericSmallCapital10(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		Random(10, NUMERIC|SMALL|CAPITAL)
+	}
+}
+
+func BenchmarkRandomNumericSmallSymbol10(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		Random(10, NUMERIC|SMALL|SYMBOL)
+	}
+}
+
+func BenchmarkRandomNumericCapitalSymbol10(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		Random(10, NUMERIC|CAPITAL|SYMBOL)
+	}
+}
+
+func BenchmarkRandomSmallCapitalSymbol10(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		Random(10, SMALL|CAPITAL|SYMBOL)
+	}
+}
+
+func BenchmarkRandom10(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		Random(10, NUMERIC|SMALL|CAPITAL|SYMBOL)
+	}
+}

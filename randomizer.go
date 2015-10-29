@@ -5,6 +5,7 @@ import (
 	"math"
 	"math/rand"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -23,6 +24,11 @@ const (
 	SYMBOL                 = 1 << CAPITAL
 )
 
+type Character struct {
+	Vocal, Consonant int
+	mux              *sync.Mutex
+}
+
 //Random
 //Parameters desired length, and mask, const CAPITAL, SMALL, NUMERIC, SYMBOL
 func Random(length int, mask uint64, args ...interface{}) (string, error) {
@@ -38,48 +44,38 @@ func Random(length int, mask uint64, args ...interface{}) (string, error) {
 		}
 	}
 
-	rand.Seed(time.Now().UnixNano())
-
 	output := ""
+	strchan := make(chan string, length)
+	defer close(strchan)
 
 	if pronounce == true {
-		//rule max consonant and vowel is 2
-		c := 0
-		v := 0
+
+		var wg sync.WaitGroup
+		wg.Add(length)
+
+		char := &Character{0, 0, &sync.Mutex{}}
+
 		for i := 0; i < length; i++ {
-			seedtype, _ := RandomMinMax(_SEED_VOWEL, _SEED_CONSONANT)
-
-			if seedtype == _SEED_VOWEL {
-				v += 1
-				c = 0
-			}
-
-			if seedtype == _SEED_CONSONANT {
-				v = 0
-				c += 1
-			}
-
-			if v > 2 {
-				seedtype = _SEED_CONSONANT
-				v = 0
-				c = 1
-			}
-
-			if c > 2 {
-				seedtype = _SEED_VOWEL
-				v = 1
-				c = 0
-			}
-
-			seedbox := _populate(mask, seedtype)
-			output += _randomize(seedbox)
+			go char.RandomPronounce(mask, strchan, &wg)
 		}
+
+		wg.Wait()
 
 	} else {
 		seedbox := _populate(mask, _SEED_ALL)
 
 		for i := 0; i < length; i++ {
-			output += _randomize(seedbox)
+			go func() {
+				strchan <- _randomize(seedbox)
+			}()
+		}
+
+	}
+
+	for i := 0; i < length; i++ {
+		select {
+		case str := <-strchan:
+			output += str
 		}
 	}
 
@@ -92,8 +88,6 @@ func RandomInt(length int) (int64, error) {
 	if length < 1 || length > 18 {
 		return 0, errors.New("Invalid length")
 	}
-
-	rand.Seed(time.Now().UnixNano())
 
 	min := int64(math.Pow10(length - 1))
 	max := int64(math.Pow10(length) - 1)
@@ -112,7 +106,51 @@ func RandomMinMax(min, max int64) (int64, error) {
 		return 0, errors.New("Invalid parameter(s)")
 	}
 
+	rand.Seed(time.Now().UnixNano())
 	return min + rand.Int63n(max-min), nil
+}
+
+func (char *Character) RandomPronounce(mask uint64, ch chan string, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	seedtype, _ := RandomMinMax(_SEED_VOWEL, _SEED_CONSONANT)
+
+	//rule max consonant and vowel is 2
+	if seedtype == _SEED_VOWEL {
+		char.mux.Lock()
+		char.Vocal += 1
+		char.Consonant = 0
+		char.mux.Unlock()
+	}
+
+	if seedtype == _SEED_CONSONANT {
+		char.mux.Lock()
+		char.Vocal = 0
+		char.Consonant += 1
+		char.mux.Unlock()
+
+	}
+
+	if char.Vocal > 2 {
+		char.mux.Lock()
+		char.Vocal = 0
+		char.Consonant = 1
+		char.mux.Unlock()
+
+		seedtype = _SEED_CONSONANT
+	}
+
+	if char.Consonant > 2 {
+		char.mux.Lock()
+		char.Vocal = 1
+		char.Consonant = 0
+		char.mux.Unlock()
+
+		seedtype = _SEED_VOWEL
+	}
+
+	seedbox := _populate(mask, seedtype)
+	ch <- _randomize(seedbox)
 }
 
 func _populate(mask uint64, seedtype int64) string {

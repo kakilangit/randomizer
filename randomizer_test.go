@@ -20,6 +20,7 @@ func TestRandom(t *testing.T) {
 	if err != nil {
 		t.Error(err.Error())
 	}
+	t.Log(length, v)
 
 	//Pronounce true
 	pronounce = true
@@ -32,7 +33,7 @@ func TestRandom(t *testing.T) {
 		t.Errorf("Expected %d, got %d", length, len(v))
 	}
 
-	t.Log(v)
+	t.Log(length, v)
 }
 
 func TestRandomInt(t *testing.T) {

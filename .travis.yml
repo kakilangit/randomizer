@@ -1,2 +1,6 @@
 language: go
+before_install:
+  - pip install --user codecov
 script: go test -v ./...
+after_success:
+  - codecov

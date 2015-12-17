@@ -1,6 +1,8 @@
 #Randomizer
 
 [![Build Status](https://travis-ci.org/kakilangit/randomizer.svg?branch=master)](https://travis-ci.org/kakilangit/randomizer)
+[![codecov.io](http://codecov.io/github/kakilangit/randomizer/coverage.svg?branch=master)](http://codecov.io/github/kakilangit/randomizer?branch=master)
+
 
 ##Installation
 
@@ -35,12 +37,12 @@
     }
     log.Println(m)
 
-    
+
 
 
 The MIT License (MIT)
 
-Copyright (c) 2015 kakilangit 
+Copyright (c) 2015 kakilangit
 
 theguywhodrinkscoffeeandcodes@gmail.com
 
@@ -61,6 +63,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-
-

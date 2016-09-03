@@ -15,7 +15,7 @@
 ###Random String
 
     pronounce := true
-    s, e := randomizer.Random(10, randomizer.NUMERIC|randomizer.SMALL, pronounce)
+    s, e := randomizer.Random(10, randomizer.Numeric|randomizer.Small, pronounce)
     if e != nil {
         panic(e)
     }

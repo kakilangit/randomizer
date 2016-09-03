@@ -9,28 +9,30 @@ import (
 	"time"
 )
 
+//Constant
 const (
-	_SET_VOWEL             = "aiueo"
-	_SET_CONSONANT         = "bcdfghjklmnpqrstvwqyz"
-	_SET_NUMERIC_VOWEL     = "0134"
-	_SET_NUMERIC_CONSONANT = "256789"
-	_SET_SYMBOL            = "~!@#$%^&*()_+`=-{}|[]\\;':\",./<>?"
-	_SEED_VOWEL            = 1
-	_SEED_CONSONANT        = 2
-	_SEED_ALL              = 3
-	NUMERIC                = 1
-	SMALL                  = 1 << NUMERIC
-	CAPITAL                = 1 << SMALL
-	SYMBOL                 = 1 << CAPITAL
+	setVowel            = "aiueo"
+	setConsonant        = "bcdfghjklmnpqrstvwqyz"
+	setNumericVowel     = "0134"
+	setNumericConsonant = "256789"
+	setSymbol           = "~!@#$%^&*()_+`=-{}|[]\\;':\",./<>?"
+	seedVowel           = 1
+	seedConsonant       = 2
+	seedAll             = 3
+	Numeric             = 1
+	Small               = 1 << Numeric
+	Capital             = 1 << Small
+	Symbol              = 1 << Capital
 )
 
+//Character type
 type Character struct {
 	Vocal, Consonant int
 	mux              *sync.Mutex
 }
 
-//Random
-//Parameters desired length, and mask, const CAPITAL, SMALL, NUMERIC, SYMBOL
+//Random function
+//Parameters desired length, and mask, const Capital, Small, Numeric, Symbol
 func Random(length int, mask uint64, args ...interface{}) (string, error) {
 	if length < 1 {
 		return "", errors.New("Invalid length")
@@ -62,7 +64,7 @@ func Random(length int, mask uint64, args ...interface{}) (string, error) {
 		wg.Wait()
 
 	} else {
-		seedbox := _populate(mask, _SEED_ALL)
+		seedbox := _populate(mask, seedAll)
 
 		for i := 0; i < length; i++ {
 			go func() {
@@ -110,23 +112,24 @@ func RandomMinMax(min, max int64) (int64, error) {
 	return min + rand.Int63n(max-min), nil
 }
 
+//RandomPronounce to produce pronounce random char
 func (char *Character) RandomPronounce(mask uint64, ch chan string, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	seedtype, _ := RandomMinMax(_SEED_VOWEL, _SEED_CONSONANT)
+	seedtype, _ := RandomMinMax(seedVowel, seedConsonant)
 
 	//rule max consonant and vowel is 2
-	if seedtype == _SEED_VOWEL {
+	if seedtype == seedVowel {
 		char.mux.Lock()
-		char.Vocal += 1
+		char.Vocal++
 		char.Consonant = 0
 		char.mux.Unlock()
 	}
 
-	if seedtype == _SEED_CONSONANT {
+	if seedtype == seedConsonant {
 		char.mux.Lock()
 		char.Vocal = 0
-		char.Consonant += 1
+		char.Consonant++
 		char.mux.Unlock()
 
 	}
@@ -137,7 +140,7 @@ func (char *Character) RandomPronounce(mask uint64, ch chan string, wg *sync.Wai
 		char.Consonant = 1
 		char.mux.Unlock()
 
-		seedtype = _SEED_CONSONANT
+		seedtype = seedConsonant
 	}
 
 	if char.Consonant > 2 {
@@ -146,7 +149,7 @@ func (char *Character) RandomPronounce(mask uint64, ch chan string, wg *sync.Wai
 		char.Consonant = 0
 		char.mux.Unlock()
 
-		seedtype = _SEED_VOWEL
+		seedtype = seedVowel
 	}
 
 	seedbox := _populate(mask, seedtype)
@@ -156,43 +159,43 @@ func (char *Character) RandomPronounce(mask uint64, ch chan string, wg *sync.Wai
 func _populate(mask uint64, seedtype int64) string {
 	seedbox := ""
 
-	if mask&NUMERIC > 0 {
+	if mask&Numeric > 0 {
 		switch seedtype {
-		case _SEED_VOWEL:
-			seedbox += _SET_NUMERIC_VOWEL
-		case _SEED_CONSONANT:
-			seedbox += _SET_NUMERIC_CONSONANT
-		case _SEED_ALL:
-			seedbox += _SET_NUMERIC_CONSONANT + _SET_NUMERIC_VOWEL
+		case seedVowel:
+			seedbox += setNumericVowel
+		case seedConsonant:
+			seedbox += setNumericConsonant
+		case seedAll:
+			seedbox += setNumericConsonant + setNumericVowel
 		}
 	}
 
-	if mask&SMALL > 0 {
+	if mask&Small > 0 {
 		switch seedtype {
-		case _SEED_VOWEL:
+		case seedVowel:
 
-			seedbox += _SET_VOWEL
-		case _SEED_CONSONANT:
-			seedbox += _SET_CONSONANT
-		case _SEED_ALL:
-			seedbox += _SET_VOWEL + _SET_CONSONANT
+			seedbox += setVowel
+		case seedConsonant:
+			seedbox += setConsonant
+		case seedAll:
+			seedbox += setVowel + setConsonant
 		}
 
 	}
 
-	if mask&CAPITAL > 0 {
+	if mask&Capital > 0 {
 		switch seedtype {
-		case _SEED_VOWEL:
-			seedbox += strings.ToUpper(_SET_VOWEL)
-		case _SEED_CONSONANT:
-			seedbox += strings.ToUpper(_SET_CONSONANT)
-		case _SEED_ALL:
-			seedbox += strings.ToUpper(_SET_VOWEL + _SET_CONSONANT)
+		case seedVowel:
+			seedbox += strings.ToUpper(setVowel)
+		case seedConsonant:
+			seedbox += strings.ToUpper(setConsonant)
+		case seedAll:
+			seedbox += strings.ToUpper(setVowel + setConsonant)
 		}
 	}
 
-	if (mask&SYMBOL > 0) && (seedtype == _SEED_ALL) {
-		seedbox += _SET_SYMBOL
+	if (mask&Symbol > 0) && (seedtype == seedAll) {
+		seedbox += setSymbol
 	}
 
 	return seedbox

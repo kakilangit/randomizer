@@ -1,12 +1,12 @@
 package randomizer
 
 import (
+	"crypto/rand"
 	"errors"
 	"math"
-	"math/rand"
+	"math/big"
 	"strings"
 	"sync"
-	"time"
 )
 
 //Constant
@@ -27,15 +27,15 @@ const (
 
 //Character type
 type Character struct {
+	mux              sync.Mutex
 	Vocal, Consonant int
-	mux              *sync.Mutex
 }
 
 //Random function
 //Parameters desired length, and mask, const Capital, Small, Numeric, Symbol
 func Random(length int, mask uint64, args ...interface{}) (string, error) {
 	if length < 1 {
-		return "", errors.New("Invalid length")
+		return "", errors.New("invalid length")
 	}
 
 	pronounce := false
@@ -55,7 +55,7 @@ func Random(length int, mask uint64, args ...interface{}) (string, error) {
 		var wg sync.WaitGroup
 		wg.Add(length)
 
-		char := &Character{0, 0, &sync.Mutex{}}
+		char := &Character{sync.Mutex{}, 0, 0}
 
 		for i := 0; i < length; i++ {
 			go char.RandomPronounce(mask, strchan, &wg)
@@ -88,7 +88,7 @@ func Random(length int, mask uint64, args ...interface{}) (string, error) {
 //Parameters desired length, max length = 19, max random = (10 pow 20) - 1
 func RandomInt(length int) (int64, error) {
 	if length < 1 || length > 18 {
-		return 0, errors.New("Invalid length")
+		return 0, errors.New("invalid length")
 	}
 
 	min := int64(math.Pow10(length - 1))
@@ -105,50 +105,46 @@ func RandomMinMax(min, max int64) (int64, error) {
 	}
 
 	if min <= math.MinInt64 || max >= math.MaxInt64 {
-		return 0, errors.New("Invalid parameter(s)")
+		return 0, errors.New("invalid parameter(s)")
 	}
 
-	rand.Seed(time.Now().UnixNano())
-	return min + rand.Int63n(max-min), nil
+	nBig, err := rand.Int(rand.Reader, big.NewInt(max-min))
+	if err != nil {
+		return 0, err
+	}
+
+	return min + nBig.Int64(), nil
 }
 
 //RandomPronounce to produce pronounce random char
 func (char *Character) RandomPronounce(mask uint64, ch chan string, wg *sync.WaitGroup) {
 	defer wg.Done()
+	defer char.mux.Unlock()
 
 	seedtype, _ := RandomMinMax(seedVowel, seedConsonant)
 
 	//rule max consonant and vowel is 2
-	if seedtype == seedVowel {
-		char.mux.Lock()
+
+	char.mux.Lock()
+
+	switch seedtype {
+	case seedVowel:
 		char.Vocal++
 		char.Consonant = 0
-		char.mux.Unlock()
-	}
-
-	if seedtype == seedConsonant {
-		char.mux.Lock()
+	case seedConsonant:
 		char.Vocal = 0
 		char.Consonant++
-		char.mux.Unlock()
-
 	}
 
 	if char.Vocal > 2 {
-		char.mux.Lock()
 		char.Vocal = 0
 		char.Consonant = 1
-		char.mux.Unlock()
-
 		seedtype = seedConsonant
 	}
 
 	if char.Consonant > 2 {
-		char.mux.Lock()
 		char.Vocal = 1
 		char.Consonant = 0
-		char.mux.Unlock()
-
 		seedtype = seedVowel
 	}
 

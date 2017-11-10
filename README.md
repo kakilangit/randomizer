@@ -1,18 +1,18 @@
-#Randomizer
+# Randomizer
 
 [![Build Status](https://travis-ci.org/kakilangit/randomizer.svg?branch=master)](https://travis-ci.org/kakilangit/randomizer)
 [![codecov.io](http://codecov.io/github/kakilangit/randomizer/coverage.svg?branch=master)](http://codecov.io/github/kakilangit/randomizer?branch=master)
 
 
-##Installation
+## Installation
 
-    go get github.com/kakilangit/randomizer
+    go get -u -v github.com/kakilangit/randomizer
 
-##Usage
+## Usage
 
     import "github.com/kakilangit/randomizer"
 
-###Random String
+### Random String
 
     pronounce := true
     s, e := randomizer.Random(10, randomizer.Numeric|randomizer.Small, pronounce)
@@ -21,7 +21,7 @@
     }
     fmt.Print(s)
 
-###Random Integer
+### Random Integer
 
     i, e := randomizer.RandomInt(15)
     if e != nil {
@@ -29,7 +29,7 @@
     }
     fmt.Print(i)
 
-###Random Integer with Boundary
+### Random Integer with Boundary
 
     m, e := randomizer.RandomMinMax(-10, 10)
     if e != nil {

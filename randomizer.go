@@ -38,7 +38,13 @@ func Random(length int, mask uint64, args ...interface{}) (string, error) {
 		return "", errors.New("invalid length")
 	}
 
-	pronounce := false
+	var (
+		output    string
+		pronounce bool
+		strchan   = make(chan string, length)
+	)
+	defer close(strchan)
+
 	for _, arg := range args {
 		switch v := arg.(type) {
 		case bool:
@@ -46,32 +52,24 @@ func Random(length int, mask uint64, args ...interface{}) (string, error) {
 		}
 	}
 
-	output := ""
-	strchan := make(chan string, length)
-	defer close(strchan)
-
-	if pronounce == true {
-
+	switch pronounce {
+	case true:
 		var wg sync.WaitGroup
 		wg.Add(length)
 
 		char := &Character{sync.Mutex{}, 0, 0}
-
 		for i := 0; i < length; i++ {
 			go char.RandomPronounce(mask, strchan, &wg)
 		}
 
 		wg.Wait()
-
-	} else {
+	default:
 		seedbox := _populate(mask, seedAll)
-
 		for i := 0; i < length; i++ {
 			go func() {
 				strchan <- _randomize(seedbox)
 			}()
 		}
-
 	}
 
 	for i := 0; i < length; i++ {
